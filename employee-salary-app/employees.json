@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Paras Kapoor",
+    "position": "web desgining",
+    "salary": "50000"
+  },
+  {
+    "id": 2,
+    "name": "NIKHIL KUMAR",
+    "position": "cyber security",
+    "salary": "60000"
+  },
+  {
+    "id": 3,
+    "name": "rimlee",
+    "position": "hr",
+    "salary": "500000"
+  },
+  {
+    "id": 4,
+    "name": "sunny",
+    "position": "ceo",
+    "salary": "10000"
+  }
+]

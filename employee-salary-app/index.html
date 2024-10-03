@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMPLOYEE-SALARY-APP</title>
+  <style>
+    /* Global styles */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      color: #4caf50;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      color: #4caf50;
+      margin-bottom: 15px;
+    }
+
+    /* Table styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #4caf50;
+      color: white;
+      padding: 12px;
+      text-transform: uppercase;
+    }
+
+    td {
+      padding: 12px;
+      text-align: center;
+      transition: background-color 0.3s ease;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #e2f7e2;
+    }
+
+    /* Form styles */
+    form {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    input {
+      width: 22%;
+    }
+
+    input:focus {
+      border-color: #4caf50;
+      outline: none;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+    }
+
+    button {
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+
+    button:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    /* Action button styles */
+    td button {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      margin-right: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    td button:hover {
+      background-color: #e53935;
+      transform: scale(1.1);
+    }
+
+    td button:active {
+      transform: scale(0.9);
+    }
+
+    td button.update {
+      background-color: #2196f3;
+    }
+
+    td button.update:hover {
+      background-color: #1976d2;
+    }
+
+    td button.update:active {
+      transform: scale(0.9);
+    }
+
+    /* Animation for form appearance */
+    form {
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    /* Animation for table rows */
+    tbody tr {
+      opacity: 0;
+      transform: translateY(-10px);
+      animation: slideIn 0.3s ease forwards;
+    }
+
+    tbody tr:nth-child(even) {
+      animation-delay: 0.1s;
+    }
+
+    tbody tr:nth-child(odd) {
+      animation-delay: 0.2s;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>EMPLOYEE-SALARY-APP</h1>
+
+  <h2>Add New Employee</h2>
+  <form id="addEmployeeForm">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="text" id="position" placeholder="Position" required>
+    <input type="number" id="salary" placeholder="Salary" required>
+    <button type="submit">Add Employee</button>
+  </form>
+
+  <h2>Employees List</h2>
+  <table id="employeeTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Position</th>
+        <th>Salary</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <script>
+    // Fetch and display employees
+    async function loadEmployees() {
+      const response = await fetch('/employees');
+      const employees = await response.json();
+      const tableBody = document.querySelector('#employeeTable tbody');
+      tableBody.innerHTML = '';
+      employees.forEach((emp, index) => {
+        const row = document.createElement('tr');
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.innerHTML = `
+          <td>${emp._id}</td>
+          <td>${emp.name}</td>
+          <td>${emp.position}</td>
+          <td>${emp.salary}</td>
+          <td>
+            <button onclick="deleteEmployee('${emp._id}')">Delete</button>
+            <button class="update" onclick="updateSalary('${emp._id}')">Update Salary</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Add new employee
+    document.getElementById('addEmployeeForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const name = document.getElementById('name').value;
+      const position = document.getElementById('position').value;
+      const salary = document.getElementById('salary').value;
+
+      const response = await fetch('/employees', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, position, salary })
+      });
+
+      if (response.ok) {
+        loadEmployees();
+        event.target.reset();
+      }
+    });
+
+    // Delete employee
+    async function deleteEmployee(id) {
+      const response = await fetch(`/employees/${id}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        loadEmployees();
+      }
+    }
+
+    // Update salary
+    async function updateSalary(id) {
+      const newSalary = prompt("Enter new salary:");
+      if (newSalary) {
+        const response = await fetch(`/employees/${id}/salary`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ salary: parseInt(newSalary) })
+        });
+        if (response.ok) {
+          loadEmployees();
+        }
+      }
+    }
+
+    // Initial load of employee data
+    loadEmployees();
+  </script>
+
+</body>
+</html>
